@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ LOGIN ════════════════════════════════ -->
+<div id="login-page" class="page">
+  <div class="login-card">
+    <h1>📚 Library System</h1>
+    <p class="subtitle">Library Management System</p>
+    <div id="login-error" class="error-msg hidden"></div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Username</label>
+      <input type="text" id="login-username" placeholder="Enter username" autocomplete="username">
+    </div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Enter password" autocomplete="current-password">
+    </div>
+    <button style="width:100%" onclick="doLogin()">Login</button>
+    <div class="login-hint">
+      Admin: <b>admin</b> / <b>admin123</b><br>
+      User: <b>user</b> / <b>user123</b>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ APP ══════════════════════════════════ -->
+<div id="app-page" class="page hidden">
+
+  <!-- NAV -->
+  <nav id="nav">
+    <span class="nav-brand">📚 Library System</span>
+    <div class="nav-links" id="nav-links"></div>
+    <div class="nav-user">
+      <span id="nav-username"></span>
+      <button class="btn-white btn-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </nav>
+
+  <div id="main">
+
+    <!-- ── HOME / CATEGORY OF BOOKS ─────────────────────────────────────── -->
+    <div id="screen-home" class="screen">
+      <div class="page-title">Welcome to Library Management System</div>
+      <div class="stat-grid" id="home-stats"></div>
+      <div class="card">
+        <div class="card-title">Quick Navigation</div>
+        <div class="menu-grid" id="home-menu"></div>
+      </div>
+    </div>
+
+    <!-- ── MAINTENANCE ───────────────────────────────────────────────────── -->
+    <div id="screen-maintenance" class="screen">
+      <div class="page-title">Maintenance</div>
+      <div class="menu-grid">
+        <div class="menu-card" onclick="showScreen('add-membership')"><div class="icon">👤</div><div class="title">Add Membership</div><div class="desc">Register new member</div></div>
+        <div class="menu-card" onclick="showScreen('update-membership')"><div class="icon">✏️</div><div class="title">Update Membership</div><div class="desc">Extend or cancel membership</div></div>
+        <div class="menu-card" onclick="showScreen('add-book')"><div class="icon">📖</div><div class="title">Add Book / Movie</div><div class="desc">Add to collection</div></div>
+        <div class="menu-card" onclick="showScreen('update-book')"><div class="icon">🔄</div><div class="title">Update Book / Movie</div><div class="desc">Edit existing item</div></div>
+        <div class="menu-card" onclick="showScreen('user-management')"><div class="icon">👥</div><div class="title">User Management</div><div class="desc">Manage system users</div></div>
+      </div>
+    </div>
+
+    <!-- ── ADD MEMBERSHIP ────────────────────────────────────────────────── -->
+    <div id="screen-add-membership" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('maintenance')">Maintenance</a> › Add Membership</div>
+      <div class="page-title">Add Membership</div>
+      <div class="card">
+        <div id="add-member-error" class="error-msg hidden"></div>
+        <div id="add-member-success" class="success-msg hidden"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" id="am-name" placeholder="Enter full name">
+          </div>
+          <div class="form-group">
+            <label>Email Address <span class="req">*</span></label>
+            <input type="email" id="am-email" placeholder="Enter email">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone Number <span class="req">*</span></label>
+            <input type="tel" id="am-phone" placeholder="Enter phone number">
+          </div>
+          <div class="form-group">
+            <label>Address <span class="req">*</span></label>
+            <input type="text" id="am-address" placeholder="Enter address">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Membership Duration <span class="req">*</span></label>
+          <div class="radio-group">
+            <label><input type="radio" name="am-duration" value="6months" checked> 6 Months</label>
+            <label><input type="radio" name="am-duration" value="1year"> 1 Year</label>
+            <label><input type="radio" name="am-duration" value="2years"> 2 Years</label>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button onclick="submitAddMember()">Confirm</button>
+          <button class="btn-outline" onclick="clearForm('add-membership')">Clear</button>
+          <button class="btn-outline" onclick="showScreen('maintenance')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── UPDATE MEMBERSHIP ─────────────────────────────────────────────── -->
+    <div id="screen-update-membership" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('maintenance')">Maintenance</a> › Update Membership</div>
+      <div class="page-title">Update Membership</div>
+      <div class="card">
+        <div id="um-search-error" class="error-msg hidden"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Membership Number <span class="req">*</span></label>
+            <input type="text" id="um-no" placeholder="e.g. MEM001">
+          </div>
+          <div class="form-group" style="justify-content:flex-end; max-width:160px">
+            <label>&nbsp;</label>
+            <button onclick="lookupMember()">Search</button>
+          </div>
+        </div>
+        <div id="um-form" class="hidden">
+          <hr class="divider">
+          <div id="um-error" class="error-msg hidden"></div>
+          <div id="um-success" class="success-msg hidden"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="um-name" readonly>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="text" id="um-email" readonly>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="text" id="um-phone" readonly>
+            </div>
+            <div class="form-group">
+              <label>Current Expiry</label>
+              <input type="text" id="um-expiry" readonly>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Status</label>
+            <input type="text" id="um-status" readonly>
+          </div>
+          <hr class="divider">
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Action <span class="req">*</span></label>
+            <div class="radio-group">
+              <label><input type="radio" name="um-action" value="extend" checked onchange="toggleUmAction()"> Extend Membership</label>
+              <label><input type="radio" name="um-action" value="cancel" onchange="toggleUmAction()"> Cancel Membership</label>
+            </div>
+          </div>
+          <div id="um-extend-section">
+            <div class="form-group" style="margin-bottom:14px">
+              <label>Extend By <span class="req">*</span></label>
+              <div class="radio-group">
+                <label><input type="radio" name="um-extend" value="6months" checked> 6 Months</label>
+                <label><input type="radio" name="um-extend" value="1year"> 1 Year</label>
+                <label><input type="radio" name="um-extend" value="2years"> 2 Years</label>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="um-id">
+          <div class="btn-row">
+            <button onclick="submitUpdateMember()">Confirm</button>
+            <button class="btn-outline" onclick="showScreen('maintenance')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADD BOOK / MOVIE ───────────────────────────────────────────────── -->
+    <div id="screen-add-book" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('maintenance')">Maintenance</a> › Add Book / Movie</div>
+      <div class="page-title">Add Book / Movie</div>
+      <div class="card">
+        <div id="ab-error" class="error-msg hidden"></div>
+        <div id="ab-success" class="success-msg hidden"></div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Type <span class="req">*</span></label>
+          <div class="radio-group">
+            <label><input type="radio" name="ab-type" value="book" checked> Book</label>
+            <label><input type="radio" name="ab-type" value="movie"> Movie</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Title <span class="req">*</span></label>
+            <input type="text" id="ab-title" placeholder="Enter title">
+          </div>
+          <div class="form-group">
+            <label>Author / Director <span class="req">*</span></label>
+            <input type="text" id="ab-author" placeholder="Enter author or director">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category <span class="req">*</span></label>
+            <input type="text" id="ab-category" placeholder="e.g. Fiction, Drama, Technology">
+          </div>
+          <div class="form-group">
+            <label>ISBN / Code</label>
+            <input type="text" id="ab-isbn" placeholder="Optional">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Publisher / Studio <span class="req">*</span></label>
+            <input type="text" id="ab-publisher" placeholder="Enter publisher or studio">
+          </div>
+          <div class="form-group">
+            <label>Year <span class="req">*</span></label>
+            <input type="number" id="ab-year" placeholder="e.g. 2023" min="1800" max="2099">
+          </div>
+          <div class="form-group" style="max-width:120px">
+            <label>Copies <span class="req">*</span></label>
+            <input type="number" id="ab-copies" value="1" min="1">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button onclick="submitAddBook()">Confirm</button>
+          <button class="btn-outline" onclick="clearForm('add-book')">Clear</button>
+          <button class="btn-outline" onclick="showScreen('maintenance')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── UPDATE BOOK / MOVIE ────────────────────────────────────────────── -->
+    <div id="screen-update-book" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('maintenance')">Maintenance</a> › Update Book / Movie</div>
+      <div class="page-title">Update Book / Movie</div>
+      <div class="card">
+        <div id="ub-search-error" class="error-msg hidden"></div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Type</label>
+          <div class="radio-group">
+            <label><input type="radio" name="ub-type-filter" value="book" checked> Book</label>
+            <label><input type="radio" name="ub-type-filter" value="movie"> Movie</label>
+          </div>
+        </div>
+        <div class="search-box">
+          <input type="text" id="ub-search" placeholder="Search by title or author...">
+          <button onclick="searchBooksForUpdate()">Search</button>
+        </div>
+        <div id="ub-results" class="hidden">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Year</th><th>Select</th></tr></thead>
+              <tbody id="ub-results-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="ub-form" class="hidden">
+          <hr class="divider">
+          <div id="ub-error" class="error-msg hidden"></div>
+          <div id="ub-success" class="success-msg hidden"></div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Type <span class="req">*</span></label>
+            <div class="radio-group">
+              <label><input type="radio" name="ub-type" value="book"> Book</label>
+              <label><input type="radio" name="ub-type" value="movie"> Movie</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Title <span class="req">*</span></label><input type="text" id="ub-title"></div>
+            <div class="form-group"><label>Author / Director <span class="req">*</span></label><input type="text" id="ub-author"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Category <span class="req">*</span></label><input type="text" id="ub-category"></div>
+            <div class="form-group"><label>ISBN / Code</label><input type="text" id="ub-isbn"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Publisher / Studio <span class="req">*</span></label><input type="text" id="ub-publisher"></div>
+            <div class="form-group"><label>Year <span class="req">*</span></label><input type="number" id="ub-year"></div>
+            <div class="form-group" style="max-width:120px"><label>Copies</label><input type="number" id="ub-copies" min="1"></div>
+          </div>
+          <input type="hidden" id="ub-id">
+          <div class="btn-row">
+            <button onclick="submitUpdateBook()">Confirm</button>
+            <button class="btn-outline" onclick="document.getElementById('ub-form').classList.add('hidden')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── USER MANAGEMENT ───────────────────────────────────────────────── -->
+    <div id="screen-user-management" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('maintenance')">Maintenance</a> › User Management</div>
+      <div class="page-title">User Management</div>
+      <div class="card">
+        <div class="form-group" style="margin-bottom:16px">
+          <label>Action</label>
+          <div class="radio-group">
+            <label><input type="radio" name="um-user-action" value="new" checked onchange="toggleUserForm()"> New User</label>
+            <label><input type="radio" name="um-user-action" value="existing" onchange="toggleUserForm()"> Existing User</label>
+          </div>
+        </div>
+
+        <!-- NEW USER FORM -->
+        <div id="new-user-form">
+          <div id="nu-error" class="error-msg hidden"></div>
+          <div id="nu-success" class="success-msg hidden"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Full Name <span class="req">*</span></label><input type="text" id="nu-name" placeholder="Enter full name"></div>
+            <div class="form-group"><label>Username <span class="req">*</span></label><input type="text" id="nu-username" placeholder="Login username"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Password <span class="req">*</span></label>
+              <input type="password" id="nu-password" placeholder="Enter password" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+              <label>Role</label>
+              <select id="nu-role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button onclick="submitNewUser()">Create User</button>
+            <button class="btn-outline" onclick="clearForm('user-management')">Clear</button>
+          </div>
+        </div>
+
+        <!-- EXISTING USER -->
+        <div id="existing-user-form" class="hidden">
+          <div id="eu-error" class="error-msg hidden"></div>
+          <div id="eu-success" class="success-msg hidden"></div>
+          <div class="table-wrap" style="margin-bottom:16px">
+            <table id="users-table">
+              <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+          </div>
+          <div id="eu-edit-form" class="hidden">
+            <hr class="divider">
+            <div class="form-row">
+              <div class="form-group"><label>Full Name <span class="req">*</span></label><input type="text" id="eu-name"></div>
+              <div class="form-group"><label>Role</label><select id="eu-role"><option value="user">User</option><option value="admin">Admin</option></select></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>New Password (leave blank to keep)</label>
+                <input type="password" id="eu-password" placeholder="Leave blank to keep current" autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <div class="radio-group">
+                  <label><input type="radio" name="eu-active" value="1"> Active</label>
+                  <label><input type="radio" name="eu-active" value="0"> Inactive</label>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="eu-id">
+            <div class="btn-row">
+              <button onclick="submitEditUser()">Save Changes</button>
+              <button class="btn-outline" onclick="document.getElementById('eu-edit-form').classList.add('hidden')">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRANSACTIONS HOME ──────────────────────────────────────────────── -->
+    <div id="screen-transactions" class="screen">
+      <div class="page-title">Transactions</div>
+      <div class="menu-grid">
+        <div class="menu-card" onclick="showScreen('check-availability')"><div class="icon">🔍</div><div class="title">Check Book Availability</div><div class="desc">Search available books</div></div>
+        <div class="menu-card" onclick="showScreen('issue-book')"><div class="icon">📤</div><div class="title">Issue a Book</div><div class="desc">Issue book to member</div></div>
+        <div class="menu-card" onclick="showScreen('return-book')"><div class="icon">📥</div><div class="title">Return a Book</div><div class="desc">Process book return</div></div>
+      </div>
+    </div>
+
+    <!-- ── CHECK AVAILABILITY ────────────────────────────────────────────── -->
+    <div id="screen-check-availability" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('transactions')">Transactions</a> › Check Book Availability</div>
+      <div class="page-title">Check Book Availability</div>
+      <div class="card">
+        <div id="ca-error" class="error-msg hidden"></div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Enter at least one search criteria before submitting.</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="ca-title" placeholder="Search by title">
+          </div>
+          <div class="form-group">
+            <label>Author</label>
+            <input type="text" id="ca-author" placeholder="Search by author">
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" id="ca-category" placeholder="Search by category">
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:8px">
+          <button onclick="searchAvailability()">Search</button>
+          <button class="btn-outline" onclick="clearAvailSearch()">Clear</button>
+        </div>
+      </div>
+      <div id="ca-results" class="hidden">
+        <div class="section-heading"><h3>Search Results</h3><span id="ca-count" style="color:var(--muted);font-size:13px"></span></div>
+        <div id="ca-no-results" class="error-msg hidden">No books found matching your search.</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Type</th><th>Year</th><th>Available</th><th>Select</th></tr></thead>
+            <tbody id="ca-table-body"></tbody>
+          </table>
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button onclick="issueSelected()" id="ca-issue-btn">Issue Selected Book</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ISSUE BOOK ─────────────────────────────────────────────────────── -->
+    <div id="screen-issue-book" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('transactions')">Transactions</a> › Issue a Book</div>
+      <div class="page-title">Issue a Book</div>
+      <div class="card">
+        <div id="ib-error" class="error-msg hidden"></div>
+        <div id="ib-success" class="success-msg hidden"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Book Title <span class="req">*</span></label>
+            <input type="text" id="ib-title" placeholder="Type to search book..." oninput="searchBookTitle()">
+            <div id="ib-book-suggestions" style="position:relative"></div>
+          </div>
+          <div class="form-group">
+            <label>Author</label>
+            <input type="text" id="ib-author" readonly placeholder="Auto-populated">
+          </div>
+        </div>
+        <input type="hidden" id="ib-book-id">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Member Name / Membership No <span class="req">*</span></label>
+            <input type="text" id="ib-member-search" placeholder="Type membership no..." oninput="searchMemberInput()">
+            <div id="ib-member-suggestions" style="position:relative"></div>
+          </div>
+          <div class="form-group">
+            <label>Member Name (confirmed)</label>
+            <input type="text" id="ib-member-name" readonly placeholder="Auto-populated">
+          </div>
+        </div>
+        <input type="hidden" id="ib-member-id">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Issue Date <span class="req">*</span></label>
+            <input type="date" id="ib-issue-date" onchange="setDueDate()">
+          </div>
+          <div class="form-group">
+            <label>Return Date <span class="req">*</span> <span style="color:var(--muted);font-size:11px;font-weight:400">(max 15 days)</span></label>
+            <input type="date" id="ib-due-date" onchange="validateDueDate()">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Remarks</label>
+          <textarea id="ib-remarks" placeholder="Optional remarks"></textarea>
+        </div>
+        <div class="btn-row">
+          <button onclick="submitIssueBook()">Confirm Issue</button>
+          <button class="btn-outline" onclick="clearIssueForm()">Clear</button>
+          <button class="btn-outline" onclick="showScreen('transactions')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RETURN BOOK ────────────────────────────────────────────────────── -->
+    <div id="screen-return-book" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('transactions')">Transactions</a> › Return a Book</div>
+      <div class="page-title">Return a Book</div>
+      <div class="card">
+        <div id="rb-search-error" class="error-msg hidden"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Serial No (Issue ID) <span class="req">*</span></label>
+            <input type="text" id="rb-serial" placeholder="e.g. ISS1234567890">
+          </div>
+          <div class="form-group" style="justify-content:flex-end;max-width:160px">
+            <label>&nbsp;</label>
+            <button onclick="lookupIssue()">Search</button>
+          </div>
+        </div>
+        <div id="rb-or-select" style="margin-top:-8px;margin-bottom:16px;font-size:13px;color:var(--muted)">
+          — or — <a style="color:var(--primary);cursor:pointer" onclick="showActiveIssues()">select from active issues</a>
+        </div>
+        <div id="rb-active-list" class="hidden">
+          <div class="table-wrap" style="margin-bottom:16px">
+            <table>
+              <thead><tr><th>Serial No</th><th>Book</th><th>Member</th><th>Due Date</th><th>Select</th></tr></thead>
+              <tbody id="rb-active-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="rb-form" class="hidden">
+          <hr class="divider">
+          <div id="rb-error" class="error-msg hidden"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Book Name <span class="req">*</span></label><input type="text" id="rb-book" readonly></div>
+            <div class="form-group"><label>Author</label><input type="text" id="rb-author" readonly></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Serial No <span class="req">*</span></label><input type="text" id="rb-serial-disp" readonly></div>
+            <div class="form-group"><label>Member Name</label><input type="text" id="rb-member" readonly></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Issue Date</label><input type="date" id="rb-issue-date" readonly></div>
+            <div class="form-group"><label>Return Date <span class="req">*</span></label><input type="date" id="rb-return-date"></div>
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Remarks</label>
+            <textarea id="rb-remarks" placeholder="Optional return remarks"></textarea>
+          </div>
+          <input type="hidden" id="rb-issue-id">
+          <div class="btn-row">
+            <button onclick="submitReturn()">Confirm Return</button>
+            <button class="btn-outline" onclick="document.getElementById('rb-form').classList.add('hidden')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PAY FINE ───────────────────────────────────────────────────────── -->
+    <div id="screen-pay-fine" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('transactions')">Transactions</a> › <a onclick="showScreen('return-book')">Return a Book</a> › Fine Payment</div>
+      <div class="page-title">Fine Payment</div>
+      <div class="card">
+        <div id="pf-error" class="error-msg hidden"></div>
+        <div id="pf-info" class="info-msg hidden"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Book Name</label><input type="text" id="pf-book" readonly></div>
+          <div class="form-group"><label>Author</label><input type="text" id="pf-author" readonly></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Serial No</label><input type="text" id="pf-serial" readonly></div>
+          <div class="form-group"><label>Member</label><input type="text" id="pf-member" readonly></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Issue Date</label><input type="date" id="pf-issue-date" readonly></div>
+          <div class="form-group"><label>Return Date</label><input type="date" id="pf-return-date" readonly></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Days Overdue</label>
+            <input type="text" id="pf-days" readonly>
+          </div>
+          <div class="form-group">
+            <label>Fine Amount (₹5 per day)</label>
+            <input type="text" id="pf-fine" readonly>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Fine Paid</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="pf-paid"> Fine has been collected / paid</label>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>Remarks</label>
+          <textarea id="pf-remarks" placeholder="Optional remarks"></textarea>
+        </div>
+        <input type="hidden" id="pf-issue-id">
+        <div class="btn-row">
+          <button onclick="submitPayFine()">Confirm &amp; Complete Return</button>
+          <button class="btn-outline" onclick="showScreen('return-book')">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS ────────────────────────────────────────────────────────── -->
+    <div id="screen-reports" class="screen">
+      <div class="page-title">Reports</div>
+      <div class="menu-grid">
+        <div class="menu-card" onclick="loadReport('active-issues')"><div class="icon">📋</div><div class="title">Active Issues</div><div class="desc">Currently issued books</div></div>
+        <div class="menu-card" onclick="loadReport('memberships')"><div class="icon">👥</div><div class="title">Master List: Memberships</div><div class="desc">All library members</div></div>
+        <div class="menu-card" onclick="loadReport('movies')"><div class="icon">🎬</div><div class="title">Master List: Movies</div><div class="desc">Movie collection</div></div>
+        <div class="menu-card" onclick="loadReport('books')"><div class="icon">📚</div><div class="title">Master List: Books</div><div class="desc">Books collection</div></div>
+        <div class="menu-card" onclick="loadReport('overdue')"><div class="icon">⚠️</div><div class="title">Overdue Returns</div><div class="desc">Past due date</div></div>
+        <div class="menu-card" onclick="loadReport('pending')"><div class="icon">🕐</div><div class="title">Pending Issues</div><div class="desc">Pending requests</div></div>
+      </div>
+    </div>
+
+    <!-- ── REPORT VIEWER ──────────────────────────────────────────────────── -->
+    <div id="screen-report-view" class="screen">
+      <div class="breadcrumb"><a onclick="showScreen('reports')">Reports</a> › <span id="report-view-title"></span></div>
+      <div class="page-title" id="report-view-heading"></div>
+      <div class="card">
+        <div id="report-table-wrap" class="table-wrap"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-outline" onclick="showScreen('reports')">← Back to Reports</button>
+      </div>
+    </div>
+
+  </div><!-- #main -->
+</div><!-- #app-page -->
+
+<script src="js/app.js"></script>
+</body>
+</html>
